@@ -1,6 +1,6 @@
 <?php
 namespace EasyThumb\Genimg;
-use EasyThumb\EasyFile;
+use EasyThumb\EasyThumb;
 abstract class Thumb{
     abstract public function createFromFile($file);
     abstract public function save($file);
@@ -36,7 +36,7 @@ abstract class Thumb{
             $h=$row['h'];
             $target_w=0;
             $target_h=0;
-            if($row['type']==EasyFile::SCALE_PROJECTIVE){
+            if($row['type']==EasyThumb::SCALE_PROJECTIVE){
                 $rate=$width/$height;
                 $rate_target=$w/$h;
                 if($rate < $rate_target){ //with height

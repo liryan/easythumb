@@ -2,16 +2,8 @@
 namespace EasyThumb;
 
 use Exception;
-class EasyFile{
-    const JPEG=1;
-    const JPG=2;
-    const GIF=8;
-    const PNG=16;
-    const BIN=64;
-
-    const SCALE_PROJECTIVE=1;
-    const SCALE_FREE=2;
-
+class EasyFile
+{
     private $location='';
     private $size=[];
     private $limitsize=0;
@@ -22,16 +14,16 @@ class EasyFile{
     public function __construct()
     {
         $this->const_ar=[
-            self::JPEG=>['jpg','image/jpeg',function(){
+            EasyThumb::JPEG=>['jpg','image/jpeg',function(){
                 return JPGThumb();
             }],
-            self::JPG=>['jpg','image/jpeg',function(){
+            EasyThumb::JPG=>['jpg','image/jpeg',function(){
                 return JPGThumb();
             }],
-            self::GIF=>['gif','image/gif',function(){
+            EasyThumb::GIF=>['gif','image/gif',function(){
                 return GIFThumb();
             }],
-            self::PNG=>['png','image/png',function(){
+            EasyThumb::PNG=>['png','image/png',function(){
                 return PNGThumb();
             }],
         ];
@@ -90,7 +82,7 @@ class EasyFile{
                 throw new RuntimeException('Exceeded filesize limit.');
             }
             
-            if($this->limittype!=0 && $this->limittype!=self::$BIN ){
+            if($this->limittype!=0 && $this->limittype!=EasyThumb::$BIN ){
                 $checktypes=[];
                 foreach($this->const_ar as $flag=>$mime){
                     if($this->limittype & $flag == $flag){
