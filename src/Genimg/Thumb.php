@@ -1,6 +1,18 @@
 <?php
+/**
+ * Thumb 
+ * 图片处理类
+ * @abstract
+ * @package 
+ * @version 0.0.1
+ * @copyright 2014-2015
+ * @author Ryan <canbetter@qq.com> 
+ * @license MIT {@link http://ryanli.net}
+ */
+
 namespace EasyThumb\Genimg;
 use EasyThumb\EasyThumb;
+
 abstract class Thumb{
     private $width;
     private $height;
@@ -9,6 +21,15 @@ abstract class Thumb{
     abstract public function createFromFile($file);
     abstract public function save($res,$file);
 
+    /**
+     * setInfo 
+     * 设置图片信息
+     * @param mixed $w 
+     * @param mixed $h 
+     * @param mixed $extension 
+     * @access private
+     * @return void
+     */
     private function setInfo($w,$h,$extension)
     {
         $this->width=$w;
@@ -16,11 +37,26 @@ abstract class Thumb{
         $this->extension=$extension;
     }
 
+    /**
+     * extension 
+     * 返回图片的扩展名字
+     * @access public
+     * @return void
+     */
     public function extension()
     {
         return trim($this->extension,".");
     }
 
+    /**
+     * checkType 
+     * 工程方法，返回针对某个图片文件的处理器
+     * @param mixed $file 文件路径
+     * @param int $limittype 类型检查
+     * @static
+     * @access public
+     * @return void
+     */
     public static function checkType($file,$limittype=0)
     {
         $define=[
@@ -54,6 +90,15 @@ abstract class Thumb{
         }
     }
 
+    /**
+     * createOutFile 
+     * 创建缩略图的资源
+     * @param mixed $w 
+     * @param mixed $h 
+     * @param int $color 
+     * @access public
+     * @return void
+     */
     public function createOutFile($w,$h,$color=0)
     {
         $gd=imagecreatetruecolor ( $w, $h);
@@ -70,6 +115,14 @@ abstract class Thumb{
         return $gd;
     }
 
+    /**
+     * toSize 
+     * 缩放处理
+     * @param mixed $file 
+     * @param mixed $size 
+     * @access public
+     * @return void
+     */
     public function toSize($file,$size)
     {
         if(!file_exists($file)){
@@ -83,6 +136,7 @@ abstract class Thumb{
             throw new Exception("File size is error");
         }
         $gd=$this->createFromFile($file);
+        $sizefiles=[];
         foreach($size as $row){
             $w=$row['w'];
             $h=$row['h'];
@@ -111,15 +165,30 @@ abstract class Thumb{
             if(!$result){
                 throw new Exception("Scale $file failed");
             }
-            if(isset($row['filepath'])){ 
-                $this->save($target_gd,$row['filepath']);
+
+            $target_file='';
+
+            if(isset($row['filepath']) && $row['filepath']){ 
+                $target_file=$row['filepath'];
             }
             else{
-                $this->save($target_gd,$this->defaultName($file,$w,$h));
+                $target_file=$this->defaultName($file,$w,$h);
             }
+            $this->save($target_gd,$target_file);
+            $sizefiles[]=$target_file;
         }
+        return $sizefiles;
     }
 
+    /**
+     * defaultName 
+     * 工具类，返回缺省的名字
+     * @param mixed $file 
+     * @param mixed $w 
+     * @param mixed $h 
+     * @access private
+     * @return void
+     */
     private function defaultName($file,$w,$h)
     {
         $info=pathinfo($file);

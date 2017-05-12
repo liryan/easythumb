@@ -1,4 +1,14 @@
 <?php
+/**
+ * EasyFile 
+ * 
+ * @package 
+ * @version 0.0.1
+ * @copyright 2014-2015
+ * @author Ryan <canbetter@qq.com> 
+ * @license MIT {@link http://ryanli.net}
+ */
+
 namespace EasyThumb;
 use EasyThumb\Genimg\Thumb;
 use Exception;
@@ -11,18 +21,44 @@ class EasyFile
     private $fieldname='';
     private $localfile='';
 
+    /**
+     * where 
+     * 要存放文件的路径
+     * @param mixed $path 
+     * @access public
+     * @return void
+     */
     public function where($path)
     {
         $this->location=$path;
         return $this;
     }
 
-    public function size($w,$h,$type=EasyThumb::SCALE_PROJECTIVE,$backgroundcolor='0x000000')
+    /**
+     * size 
+     * 尺寸缩放
+     * @param mixed $w  宽
+     * @param mixed $h  高
+     * @param mixed $type  缩放类型
+     * @param string $backgroundcolor  背景颜色填充
+     * @param string $filepath  该尺寸的文件路径
+     * @access public
+     * @return void
+     */
+    public function size($w,$h,$type=EasyThumb::SCALE_PROJECTIVE,$backgroundcolor='0x000000',$filepath='')
     {
-        $this->size[]=['w'=>$w,'h'=>$h,'type'=>$type,'backgroundcolor'=>$backgroundcolor];
+        $this->size[]=['w'=>$w,'h'=>$h,'type'=>$type,'backgroundcolor'=>$backgroundcolor,'filepath'=>$filepath];
         return $this;
     }
 
+    /**
+     * limit 
+     * 文件的大小，类型限制
+     * @param int $size 
+     * @param int $type 
+     * @access public
+     * @return void
+     */
     public function limit($size=0,$type=0)
     {
         $this->limitsize=$size;
@@ -30,18 +66,38 @@ class EasyFile
         return $this;
     }
 
+    /**
+     * upload 
+     * 处理上传 
+     * @param mixed $fieldname  上传表单的文件input的name
+     * @access public
+     * @return void
+     */
     public function upload($fieldname)
     {
         $this->fieldname=$fieldname;
         return $this;
     }
 
+    /**
+     * from 
+     * 处理本地文件
+     * @param mixed $path 
+     * @access public
+     * @return void
+     */
     public function from($path)
     {
         $this->localfile=$path;
         return $this;
     }
 
+    /**
+     * done 
+     * 执行处理逻辑
+     * @access public
+     * @return void
+     */
     public function done()
     {
         if(is_file($this->location)){
@@ -92,7 +148,11 @@ class EasyFile
             throw new Exception("File dosen't exist: $this->location"); 
         }  
         
-        $thumb->toSize($this->localfile,$this->size);
-        return $this->localfile;;
+        $result=[
+            'origin'=>$this->localfile,
+        ];
+
+        $result['files']=$thumb->toSize($this->localfile,$this->size);
+        return $result;
     }
 }
