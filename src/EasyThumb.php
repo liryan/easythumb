@@ -4,6 +4,16 @@ use Illuminate\Support\Facades\Facade;
 
 class EasyThumb extends Facade
 {
+    const SCALE_PROJECTIVE=1;
+    const SCALE_FREE=2;
+
+    const JPEG=1;
+    const JPG=2;
+    const GIF=8;
+    const PNG=16;
+    const BIN=64;
+
+
     protected static function getFacadeAccessor()
     {
         return 'easythumb';

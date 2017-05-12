@@ -1,9 +1,58 @@
 <?php
 namespace EasyThumb\Genimg;
-use EasyThumb\EasyFile;
+use EasyThumb\EasyThumb;
 abstract class Thumb{
+    private $width;
+    private $height;
+    private $extension;
+
     abstract public function createFromFile($file);
-    abstract public function save($file);
+    abstract public function save($res,$file);
+
+    private function setInfo($w,$h,$extension)
+    {
+        $this->width=$w;
+        $this->height=$h;
+        $this->extension=$extension;
+    }
+
+    public function extension()
+    {
+        return trim($this->extension,".");
+    }
+
+    public static function checkType($file,$limittype=0)
+    {
+        $define=[
+           EasyThumb::GIF=>[IMAGETYPE_GIF,GIFThumb::class], 
+           EasyThumb::PNG=>[IMAGETYPE_PNG,PNGThumb::class], 
+           EasyThumb::JPG=>[IMAGETYPE_JPEG,JPGThumb::class], 
+           EasyThumb::JPEG=>[IMAGETYPE_JPEG,JPGThumb::class], 
+        ];
+
+        list($width, $height, $type, $attr)=getimagesize($file);
+
+        if($limittype > 0 && ($limittype & EasyThumb::BIN) == 0){
+            foreach($define as $k=>$row){
+                if( ($limittype & $k) > 0 && $type==$row[0]){
+                    $thumb= new $row[1]; 
+                    $thumb->setInfo($width,$height,image_type_to_extension($type));
+                    return $thumb;
+                }
+            } 
+            return null;
+        }
+        else{
+            foreach($define as $row){
+                if($type==$row[0]){
+                    $thumb= new $row[1]; 
+                    $thumb->setInfo($width,$height,image_type_to_extension($type));
+                    return $thumb;
+                }
+            } 
+            return null;
+        }
+    }
 
     public function createOutFile($w,$h,$color=0)
     {
@@ -26,7 +75,10 @@ abstract class Thumb{
         if(!file_exists($file)){
             throw new Exception("File dosen't exist");
         }
-        list($width, $height, $type, $attr)=getimagesize($file);
+
+        $width=$this->width;
+        $height=$this->height;
+
         if($width == 0 || $height==0){
             throw new Exception("File size is error");
         }
@@ -36,7 +88,7 @@ abstract class Thumb{
             $h=$row['h'];
             $target_w=0;
             $target_h=0;
-            if($row['type']==EasyFile::SCALE_PROJECTIVE){
+            if($row['type']==EasyThumb::SCALE_PROJECTIVE){
                 $rate=$width/$height;
                 $rate_target=$w/$h;
                 if($rate < $rate_target){ //with height
@@ -48,7 +100,7 @@ abstract class Thumb{
                     $target_height=$target_width/$rate;
                 }
             }
-            else if($row['type']==self::SCALE_FREE){
+            else if($row['type']==EasyThumb::SCALE_FREE){
                 $target_width=$w;
                 $target_height=$h;
             }
@@ -60,10 +112,10 @@ abstract class Thumb{
                 throw new Exception("Scale $file failed");
             }
             if(isset($row['filepath'])){ 
-                $this->save($row['filepath']);
+                $this->save($target_gd,$row['filepath']);
             }
             else{
-                $this->save($this->defaultName($file,$w,$h));
+                $this->save($target_gd,$this->defaultName($file,$w,$h));
             }
         }
     }
@@ -71,6 +123,6 @@ abstract class Thumb{
     private function defaultName($file,$w,$h)
     {
         $info=pathinfo($file);
-        return sprintf("%s/%s-%d_%d.$%s",$info['dirname'],$info['basename'],$w,$h,$info['extension']);
+        return sprintf("%s/%s-%d_%d.%s",$info['dirname'],$info['filename'],$w,$h,$info['extension']);
     }
 }
