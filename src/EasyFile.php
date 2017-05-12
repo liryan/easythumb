@@ -2,7 +2,8 @@
 namespace EasyThumb;
 use EasyThumb\Genimg\Thumb;
 use Exception;
-class EasyFile{
+class EasyFile
+{
     private $location='';
     private $size=[];
     private $limitsize=0;
