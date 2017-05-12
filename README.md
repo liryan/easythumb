@@ -46,7 +46,7 @@ function upload_test()
 function local_test()
 {
     try{
-        $url=EasyThumb::where(public_path().'/upimages/filename.jpg')    //要处理的文件路径
+        $url=EasyThumb::from(public_path().'/upimages/filename.jpg')    //要处理的文件路径
         ->size(100,100,EasyThumb::SCALE_FREE)       //自由缩放  size可以调用多个
         ->size(200,200,EasyThumb::SCALE_PROJECTIVE) //等比缩放
         ->done();

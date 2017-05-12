@@ -44,9 +44,14 @@ class EasyFile
 
     public function done()
     {
-        if(!file_exists($this->location)){
+        if(is_file($this->location)){
+            $this->location=dirname($this->location);
+        }
+
+        if(is_dir($this->location) && !file_exists($this->location)){
             throw new Exception("Directory does'n exist[$this->location]");
         }
+
         if(!$this->localfile){
             if(!$this->fieldname || !isset($_FILES[$this->fieldname]) ){
                 throw new Exception("No file to process");
