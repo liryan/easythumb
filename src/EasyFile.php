@@ -21,6 +21,7 @@ class EasyFile
     private $limittype=0;
     private $fieldname='';
     private $localfile='';
+    private $dirtype=0;
 
     /**
      * where 
@@ -134,11 +135,11 @@ class EasyFile
                 throw new Exception("File type is not allow");
             }
     
-            $filename=sha1(rand(1000,9999).$upfile['tmp_name']).".".$thumb->extension();
+            $filename=sha1(rand(10000,99999).$upfile['tmp_name']).".".$thumb->extension();
             if($this->dirtype==EasyThumb::SHA1_DIR){
                 $this->location=sprintf("%s/%s/%s",$this->location,substr($filename,0,2),substr($filename,2,2));
                 if(!file_exists($this->location)){
-                    mkdir($this->location,0644,true);
+                    mkdir($this->location,0755,true);
                 }
             }
 
@@ -167,12 +168,16 @@ class EasyFile
     {
         if($type==EasyThumb::NONE_DIR){
             if(!file_exists($this->location) && is_dir($this->location)){
-                mkdir($this->location,0644,true);
+                mkdir($this->location,0755,true);
             } 
         }
         else if($type==EasyThumb::TIME_DIR){
             $this->location=sprintf("%s/%04d%02d/%02d%02d",$this->location,date('Y'),date('m'),date('d'),date('H'));
+            if(!file_exists($this->location)){
+                mkdir($this->location,0755,true);
+            } 
         }
         $this->dirtype=$type;
+        return $this;
     }
 }
