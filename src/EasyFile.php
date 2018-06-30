@@ -11,6 +11,7 @@
 
 namespace EasyThumb;
 use EasyThumb\Genimg\Thumb;
+use EasyThumb;
 use Exception;
 class EasyFile
 {
@@ -134,6 +135,12 @@ class EasyFile
             }
     
             $filename=sha1(rand(1000,9999).$upfile['tmp_name']).".".$thumb->extension();
+            if($this->dirtype==EasyThumb::SHA1_DIR){
+                $this->location=sprintf("%s/%s/%s",$this->location,substr($filename,0,2),substr($filename,2,2));
+                if(!file_exists($this->location)){
+                    mkdir($this->location,0644,true);
+                }
+            }
 
             $this->localfile=(is_dir($this->location)?$this->location:dirname($this->location))."/".$filename;
             if(!move_uploaded_file($upfile['tmp_name'],$this->localfile)){
@@ -154,5 +161,18 @@ class EasyFile
 
         $result['files']=$thumb->toSize($this->localfile,$this->size);
         return $result;
+    }
+
+    public function autodir($type=0)
+    {
+        if($type==EasyThumb::NONE_DIR){
+            if(!file_exists($this->location) && is_dir($this->location)){
+                mkdir($this->location,0644,true);
+            } 
+        }
+        else if($type==EasyThumb::TIME_DIR){
+            $this->location=sprintf("%s/%04d%02d/%02d%02d",$this->location,date('Y'),date('m'),date('d'),date('H'));
+        }
+        $this->dirtype=$type;
     }
 }
