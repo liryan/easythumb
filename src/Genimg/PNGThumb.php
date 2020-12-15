@@ -11,7 +11,7 @@
  */
 
 namespace EasyThumb\Genimg;
-class JPGThumb extends Thumb{
+class PNGThumb extends Thumb{
     public function createFromFile($file){
         return imagecreatefrompng ($file);
     }
